@@ -76,7 +76,7 @@ def do_scheduled_images_show(cs, args):
     """Show the scheduled image settings for a server"""
     server_id = _find_server(cs, args.server).id
     result = cs.rax_scheduled_images_python_novaclient_ext.get(server_id)
-    print "Retention: %d" % result['retention']
+    print "Retention: %s" % result.retention
 
 
 @utils.arg('server', metavar='<server>', help='Name or ID of server.')
