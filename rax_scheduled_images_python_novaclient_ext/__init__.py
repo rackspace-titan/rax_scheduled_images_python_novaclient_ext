@@ -62,7 +62,13 @@ class ScheduledImageManager(base.Manager):
         :param retention: The number of scheduled images to retain.
         :rtype: :class:`ScheduledImage`
         """
-        body = {'image_schedule': {'retention': retention}}
+        try:
+            retention_val = int(retention)
+        except ValueError:
+            msg = "Retention value must be an integer"
+            raise exceptions.BadRequest(400, msg)
+
+        body = {'image_schedule': {'retention': int(retention)}}
         return self._create("/servers/%s/os-si-image-schedule" % server_id,
                             body, "image_schedule")
 
