@@ -41,7 +41,7 @@ class ScheduledImageManager(base.Manager):
         :rtype: :class:`ScheduledImage`
         """
         try:
-            return self._get("/servers/%s/os-si-image-schedule" % server_id, "image_schedule")
+            return self._get("/servers/%s/rax-si-image-schedule" % server_id, "image_schedule")
         except exceptions.NotFound:
             msg = "Scheduled images not enabled for server %s" % server_id
             raise exceptions.NotFound(404, msg)
@@ -52,7 +52,7 @@ class ScheduledImageManager(base.Manager):
 
         :param server_id: The ID of the server to disable scheduled images for.
         """
-        self._delete("/servers/%s/os-si-image-schedule" % server_id)
+        self._delete("/servers/%s/rax-si-image-schedule" % server_id)
 
     def enable(self, server_id, retention):
         """
@@ -62,8 +62,14 @@ class ScheduledImageManager(base.Manager):
         :param retention: The number of scheduled images to retain.
         :rtype: :class:`ScheduledImage`
         """
-        body = {'image_schedule': {'retention': retention}}
-        return self._create("/servers/%s/os-si-image-schedule" % server_id,
+        try:
+            retention_val = int(retention)
+        except ValueError:
+            msg = "Retention value must be an integer"
+            raise exceptions.BadRequest(400, msg)
+
+        body = {'image_schedule': {'retention': int(retention)}}
+        return self._create("/servers/%s/rax-si-image-schedule" % server_id,
                             body, "image_schedule")
 
 def _find_server(cs, server):
