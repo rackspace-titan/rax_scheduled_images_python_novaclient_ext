@@ -97,6 +97,6 @@ def do_scheduled_images_enable(cs, args):
 
 @utils.arg('server', metavar='<server>', help='Name or ID of server.')
 def do_scheduled_images_disable(cs, args):
-    """Enable scheduled images for a server"""
+    """Disable scheduled images for a server"""
     server_id = _find_server(cs, args.server).id
     result = cs.rax_scheduled_images_python_novaclient_ext.disable(server_id)
