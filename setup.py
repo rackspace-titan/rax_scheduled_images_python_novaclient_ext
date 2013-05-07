@@ -17,7 +17,7 @@ import setuptools
 
 setuptools.setup(
     name="rax_scheduled_images_python_novaclient_ext",
-    version="0.2.0",
+    version="0.2.1",
     author="Rackspace",
     author_email="eddie.sheffield@rackspace.com",
     url="https://github.com/rackspace-titan/rax_scheduled_images_python_novaclient_ext",
