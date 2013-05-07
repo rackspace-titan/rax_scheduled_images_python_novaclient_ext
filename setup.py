@@ -21,7 +21,8 @@ setuptools.setup(
     author="Rackspace",
     author_email="eddie.sheffield@rackspace.com",
     url="https://github.com/rackspace-titan/rax_scheduled_images_python_novaclient_ext",
-    description="",
+    description='Extends python-novaclient to use RAX-SI, the Rackspace Nova '
+                'API Scheduled Images extension',
     license="Apache License, Version 2.0",
     packages=["rax_scheduled_images_python_novaclient_ext"],
     install_requires=["python-novaclient"],
