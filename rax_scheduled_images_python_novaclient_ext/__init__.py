@@ -17,6 +17,8 @@
 Scheduled Images interface (1.1 extension).
 """
 
+from __future__ import print_function
+
 import urllib
 
 from novaclient import base
@@ -82,7 +84,7 @@ def do_scheduled_images_show(cs, args):
     """Show the scheduled image settings for a server"""
     server_id = _find_server(cs, args.server).id
     result = cs.rax_scheduled_images_python_novaclient_ext.get(server_id)
-    print "Retention: %s" % result.retention
+    print("Retention: %s" % result.retention)
 
 
 @utils.arg('server', metavar='<server>', help='Name or ID of server.')
