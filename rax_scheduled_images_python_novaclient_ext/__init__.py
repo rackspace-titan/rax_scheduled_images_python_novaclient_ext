@@ -26,6 +26,10 @@ from novaclient import exceptions
 from novaclient import utils
 
 
+DAYS=['sunday', 'monday', 'tuesday', 'wednesday',
+      'thursday', 'friday', 'saturday']
+
+
 class ScheduledImage(base.Resource):
     """Represents the settings for a scheduled image"""
     def __repr__(self):
@@ -43,7 +47,8 @@ class ScheduledImageManager(base.Manager):
         :rtype: :class:`ScheduledImage`
         """
         try:
-            return self._get("/servers/%s/rax-si-image-schedule" % server_id, "image_schedule")
+            return self._get("/servers/%s/rax-si-image-schedule" % server_id,
+                             "image_schedule")
         except exceptions.NotFound:
             msg = "Scheduled images not enabled for server %s" % server_id
             raise exceptions.NotFound(404, msg)
@@ -56,12 +61,14 @@ class ScheduledImageManager(base.Manager):
         """
         self._delete("/servers/%s/rax-si-image-schedule" % server_id)
 
-    def enable(self, server_id, retention):
+    def enable(self, server_id, retention, day_of_week=None):
         """
         Enable the creation of scheduled images for the server.
 
         :param server_id: The ID of the server to enable scheduled images for.
         :param retention: The number of scheduled images to retain.
+        :param day_of_week: If given, the day of week (0-6, 0=Sunday) to create
+        a weekly schedule for. If omitted, create a daily schedule.
         :rtype: :class:`ScheduledImage`
         """
         try:
@@ -70,7 +77,17 @@ class ScheduledImageManager(base.Manager):
             msg = "Retention value must be an integer"
             raise exceptions.BadRequest(400, msg)
 
-        body = {'image_schedule': {'retention': int(retention)}}
+        body = {'image_schedule': {'retention': int(retention_val)}}
+
+        if day_of_week is not None:
+            day_of_week_str = str(day_of_week)
+            if day_of_week_str.lower() not in DAYS:
+                msg = ("Day_of_week value must be a string in %s"
+                       % str(DAYS))
+                raise exceptions.BadRequest(400, msg)
+
+            body['image_schedule']['day_of_week'] = day_of_week_str
+
         return self._create("/servers/%s/rax-si-image-schedule" % server_id,
                             body, "image_schedule")
 
@@ -84,17 +101,29 @@ def do_scheduled_images_show(cs, args):
     """Show the scheduled image settings for a server"""
     server_id = _find_server(cs, args.server).id
     result = cs.rax_scheduled_images_python_novaclient_ext.get(server_id)
+    day_of_week = getattr(result, 'day_of_week', None)
+    schedule_type = 'Daily'
+    if day_of_week is not None:
+        schedule_type = 'Weekly on: %s' % day_of_week
+    print("Schedule type: %s" % schedule_type)
     print("Retention: %s" % result.retention)
 
 
 @utils.arg('server', metavar='<server>', help='Name or ID of server.')
-@utils.arg('retention', metavar='<retention>', 
+@utils.arg('retention', metavar='<retention>', type=int,
            help='Number of scheduled images to retain')
+@utils.arg('--day-of-week', default=None, metavar='day',
+           help='If given, the day of week to create a weekly schedule '
+                'for. If omitted, create a daily schedule. Valid values are: '
+                '%s' % str(DAYS))
 def do_scheduled_images_enable(cs, args):
     """Enable scheduled images for a server"""
+    day_of_week = args.day_of_week
+    if day_of_week is not None:
+        day_of_week = day_of_week.lower()
     server_id = _find_server(cs, args.server).id
     result = cs.rax_scheduled_images_python_novaclient_ext.enable(
-        server_id, args.retention)
+        server_id, args.retention, day_of_week=day_of_week)
 
 
 @utils.arg('server', metavar='<server>', help='Name or ID of server.')
