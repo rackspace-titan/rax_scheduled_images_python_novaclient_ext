@@ -23,6 +23,7 @@ import urllib
 
 from novaclient import base
 from novaclient import exceptions
+from novaclient.openstack.common import cliutils
 from novaclient import utils
 
 
@@ -96,7 +97,7 @@ def _find_server(cs, server):
     return utils.find_resource(cs.servers, server)
 
 
-@utils.arg('server', metavar='<server>', help='Name or ID of server.')
+@cliutils.arg('server', metavar='<server>', help='Name or ID of server.')
 def do_scheduled_images_show(cs, args):
     """Show the scheduled image settings for a server"""
     server_id = _find_server(cs, args.server).id
@@ -109,10 +110,10 @@ def do_scheduled_images_show(cs, args):
     print("Retention: %s" % result.retention)
 
 
-@utils.arg('server', metavar='<server>', help='Name or ID of server.')
-@utils.arg('retention', metavar='<retention>', type=int,
+@cliutils.arg('server', metavar='<server>', help='Name or ID of server.')
+@cliutils.arg('retention', metavar='<retention>', type=int,
            help='Number of scheduled images to retain')
-@utils.arg('--day-of-week', default=None, metavar='day',
+@cliutils.arg('--day-of-week', default=None, metavar='day',
            help='If given, the day of week to create a weekly schedule '
                 'for. If omitted, create a daily schedule. Valid values are: '
                 '%s' % str(DAYS))
@@ -126,7 +127,7 @@ def do_scheduled_images_enable(cs, args):
         server_id, args.retention, day_of_week=day_of_week)
 
 
-@utils.arg('server', metavar='<server>', help='Name or ID of server.')
+@cliutils.arg('server', metavar='<server>', help='Name or ID of server.')
 def do_scheduled_images_disable(cs, args):
     """Disable scheduled images for a server"""
     server_id = _find_server(cs, args.server).id
