@@ -23,6 +23,7 @@ import urllib
 
 from novaclient import base
 from novaclient import exceptions
+from novaclient.openstack.common import cliutils
 from novaclient import utils
 
 try:
